@@ -18,6 +18,7 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 
 // Admin pages
+import AdminLogin from "./pages/Admin/Login";
 import AdminLayout from "./pages/Admin/AdminLayout";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import Subscriptions from "./pages/Admin/Subscriptions";
@@ -26,6 +27,7 @@ import AccessControl from "./pages/Admin/AccessControl";
 import AdminReports from "./pages/Admin/Reports";
 import AdminSettings from "./pages/Admin/Settings";
 import { AuthGuard } from "./components/AuthGuard";
+import { AdminGuard } from "./components/AdminGuard";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,7 @@ const App = () => (
         <Routes>
           {/* Rota pública (login) */}
           <Route path="/" element={<Index />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           
           {/* Rotas protegidas */}
           <Route element={<AuthGuard />}>
@@ -55,14 +58,16 @@ const App = () => (
             </Route>
           </Route>
           
-          {/* Admin Routes (public for demonstration) */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="assinaturas" element={<Subscriptions />} />
-            <Route path="clientes" element={<Clients />} />
-            <Route path="acesso" element={<AccessControl />} />
-            <Route path="relatorios" element={<AdminReports />} />
-            <Route path="configuracoes" element={<AdminSettings />} />
+          {/* Admin Routes (protected with AdminGuard) */}
+          <Route element={<AdminGuard />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="assinaturas" element={<Subscriptions />} />
+              <Route path="clientes" element={<Clients />} />
+              <Route path="acesso" element={<AccessControl />} />
+              <Route path="relatorios" element={<AdminReports />} />
+              <Route path="configuracoes" element={<AdminSettings />} />
+            </Route>
           </Route>
           
           <Route path="*" element={<NotFound />} />

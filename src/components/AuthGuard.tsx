@@ -6,7 +6,7 @@ export const AuthGuard = () => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   
   // Lista de rotas que não precisam de autenticação
-  const publicRoutes = ['/', '/admin', '/admin/assinaturas', '/admin/clientes', '/admin/acesso', '/admin/relatorios', '/admin/configuracoes'];
+  const publicRoutes = ['/', '/admin/login'];
   
   // Verifica se a rota atual é pública
   const isPublicRoute = publicRoutes.includes(location.pathname);
