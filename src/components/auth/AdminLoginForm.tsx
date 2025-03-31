@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
 import { LogIn, Shield } from 'lucide-react';
-import { verifyAdminCredentials } from '@/services/supabaseService';
+import { verifyAdminCredentials } from '@/services/supabase/companiesService';
 
 const adminLoginSchema = z.object({
   email: z.string().email('Digite um email válido'),

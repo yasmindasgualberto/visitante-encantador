@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -63,12 +64,12 @@ const Clients: React.FC = () => {
 
   const handleFormSubmit = async (data: any) => {
     try {
-      if (isEditing && editingCompany) {
+      if (isEditing && editingCompany?.id) {
         // Atualiza empresa existente
-        const updated = await updateCompany(editingCompany.id!, data);
+        await updateCompany(editingCompany.id, data);
         setCompanies(companies.map(company => 
           company.id === editingCompany.id 
-            ? { ...company, ...updated }
+            ? { ...company, ...data, id: company.id }
             : company
         ));
         toast.success('Empresa atualizada com sucesso');

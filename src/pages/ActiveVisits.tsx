@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { UserPlus, Search, Check, Eye } from 'lucide-react';
 import { Visit } from '@/types';
 import { toast } from 'sonner';
-import { getActiveVisits, checkoutVisit } from '@/services/supabaseService';
+import { getActiveVisits, checkoutVisit } from '@/services/supabase/visitsService';
 
 const ActiveVisits = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
