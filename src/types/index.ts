@@ -8,6 +8,7 @@ export interface Visitor {
   email: string;
   company?: string;
   createdAt: Date;
+  companyId?: string; // Adicionado para vincular visitante a uma empresa
 }
 
 export interface Room {
@@ -15,6 +16,7 @@ export interface Room {
   name: string;
   floor: string;
   description?: string;
+  companyId?: string; // Adicionado para vincular sala a uma empresa
 }
 
 export interface Companion {
@@ -36,6 +38,7 @@ export interface Visit {
   exitTime: Date | null;
   companions: Companion[];
   status: 'active' | 'completed' | 'cancelled';
+  companyId: string; // Adicionado para vincular visita a uma empresa
 }
 
 export interface Badge {
@@ -54,4 +57,16 @@ export interface Company {
   plan: 'basic' | 'professional' | 'enterprise';
   status: 'active' | 'blocked' | 'pending';
   createdAt: string;
+}
+
+export interface VisitReport {
+  daily: VisitsByRoom[];
+  weekly: VisitsByRoom[];
+  monthly: VisitsByRoom[];
+}
+
+export interface VisitsByRoom {
+  roomId: string;
+  roomName: string;
+  count: number;
 }

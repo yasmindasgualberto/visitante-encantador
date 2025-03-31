@@ -1,64 +1,39 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus, Eye, Edit, Trash } from 'lucide-react';
+import { Search, Filter, Plus, Eye, Edit, Trash, BarChart } from 'lucide-react';
 import { toast } from 'sonner';
 import CompanyForm from '@/components/admin/CompanyForm';
-
-// Tipo para as empresas
-interface Company {
-  id: string;
-  companyName: string;
-  responsibleName: string;
-  plan: string;
-  status: string;
-  createdAt: string;
-  email: string;
-  password: string;
-}
+import { getCompanies, addCompany, updateCompany, deleteCompany } from '@/services/mockData';
+import { Company } from '@/types';
 
 const Clients: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Partial<Company> | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Mock inicial de empresas
-  const [companies, setCompanies] = useState<Company[]>([
-    {
-      id: '1',
-      companyName: 'Empresa ABC',
-      responsibleName: 'João Silva',
-      plan: 'professional',
-      status: 'active',
-      createdAt: '15/01/2023',
-      email: 'joao@empresaabc.com',
-      password: 'senha123'
-    },
-    {
-      id: '2',
-      companyName: 'Empresa XYZ',
-      responsibleName: 'Maria Oliveira',
-      plan: 'basic',
-      status: 'blocked',
-      createdAt: '02/03/2023',
-      email: 'maria@empresaxyz.com',
-      password: 'senha456'
-    },
-    {
-      id: '3',
-      companyName: 'Empresa 123',
-      responsibleName: 'Carlos Santos',
-      plan: 'enterprise',
-      status: 'active',
-      createdAt: '10/11/2022',
-      email: 'carlos@empresa123.com',
-      password: 'senha789'
-    },
-  ]);
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const data = await getCompanies();
+        setCompanies(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Erro ao buscar empresas:', error);
+        toast.error('Erro ao carregar dados das empresas');
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCompanies();
+  }, []);
 
   const handleOpenForm = () => {
     setIsFormOpen(true);
@@ -72,40 +47,40 @@ const Clients: React.FC = () => {
     setIsFormOpen(true);
   };
 
-  const handleDeleteCompany = (companyId: string) => {
+  const handleDeleteCompany = async (companyId: string) => {
     if (window.confirm('Tem certeza que deseja excluir esta empresa?')) {
-      setCompanies(companies.filter(company => company.id !== companyId));
-      toast.success('Empresa excluída com sucesso');
+      try {
+        await deleteCompany(companyId);
+        setCompanies(companies.filter(company => company.id !== companyId));
+        toast.success('Empresa excluída com sucesso');
+      } catch (error) {
+        toast.error('Erro ao excluir empresa');
+      }
     }
   };
 
-  const handleFormSubmit = (data: any) => {
-    if (isEditing && editingCompany) {
-      // Atualiza empresa existente
-      setCompanies(companies.map(company => 
-        company.id === editingCompany.id 
-          ? { ...company, ...data }
-          : company
-      ));
-      toast.success('Empresa atualizada com sucesso');
-    } else {
-      // Adiciona nova empresa
-      const newCompany: Company = {
-        id: Date.now().toString(),
-        companyName: data.companyName,
-        responsibleName: data.responsibleName,
-        plan: data.plan,
-        status: data.status,
-        createdAt: new Date().toLocaleDateString('pt-BR'),
-        email: data.email,
-        password: data.password
-      };
+  const handleFormSubmit = async (data: any) => {
+    try {
+      if (isEditing && editingCompany) {
+        // Atualiza empresa existente
+        const updated = await updateCompany(editingCompany.id!, data);
+        setCompanies(companies.map(company => 
+          company.id === editingCompany.id 
+            ? { ...company, ...updated }
+            : company
+        ));
+        toast.success('Empresa atualizada com sucesso');
+      } else {
+        // Adiciona nova empresa
+        const newCompany = await addCompany(data);
+        setCompanies([...companies, newCompany]);
+        toast.success('Empresa cadastrada com sucesso');
+      }
       
-      setCompanies([...companies, newCompany]);
-      toast.success('Empresa cadastrada com sucesso');
+      setIsFormOpen(false);
+    } catch (error) {
+      toast.error('Erro ao salvar empresa');
     }
-    
-    setIsFormOpen(false);
   };
 
   const filteredCompanies = companies.filter(company => 
@@ -192,63 +167,74 @@ const Clients: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Empresa</TableHead>
-                <TableHead>Responsável</TableHead>
-                <TableHead>Plano</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Assinante desde</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCompanies.length > 0 ? (
-                filteredCompanies.map((company) => (
-                  <TableRow key={company.id}>
-                    <TableCell className="font-medium">{company.companyName}</TableCell>
-                    <TableCell>{company.responsibleName}</TableCell>
-                    <TableCell>{getPlanLabel(company.plan)}</TableCell>
-                    <TableCell>
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(company.status)}`}>
-                        {getStatusLabel(company.status)}
-                      </span>
-                    </TableCell>
-                    <TableCell>{company.createdAt}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          onClick={() => handleEditCompany(company)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          className="text-destructive"
-                          onClick={() => handleDeleteCompany(company.id)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Empresa</TableHead>
+                  <TableHead>Responsável</TableHead>
+                  <TableHead>Plano</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Assinante desde</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCompanies.length > 0 ? (
+                  filteredCompanies.map((company) => (
+                    <TableRow key={company.id}>
+                      <TableCell className="font-medium">{company.companyName}</TableCell>
+                      <TableCell>{company.responsibleName}</TableCell>
+                      <TableCell>{getPlanLabel(company.plan)}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(company.status)}`}>
+                          {getStatusLabel(company.status)}
+                        </span>
+                      </TableCell>
+                      <TableCell>{company.createdAt}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Link to={`/admin/clientes/relatorios/${company.id}`}>
+                            <Button variant="outline" size="icon" title="Ver relatórios">
+                              <BarChart className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button variant="outline" size="icon">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => handleEditCompany(company)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="text-destructive"
+                            onClick={() => handleDeleteCompany(company.id)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                      Nenhuma empresa encontrada
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                    Nenhuma empresa encontrada
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 

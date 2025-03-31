@@ -23,6 +23,7 @@ import AdminLayout from "./pages/Admin/AdminLayout";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import Subscriptions from "./pages/Admin/Subscriptions";
 import Clients from "./pages/Admin/Clients";
+import CompanyReports from "./pages/Admin/CompanyReports";
 import AccessControl from "./pages/Admin/AccessControl";
 import AdminReports from "./pages/Admin/Reports";
 import AdminSettings from "./pages/Admin/Settings";
@@ -64,6 +65,7 @@ const App = () => (
               <Route index element={<AdminDashboard />} />
               <Route path="assinaturas" element={<Subscriptions />} />
               <Route path="clientes" element={<Clients />} />
+              <Route path="clientes/relatorios/:id" element={<CompanyReports />} />
               <Route path="acesso" element={<AccessControl />} />
               <Route path="relatorios" element={<AdminReports />} />
               <Route path="configuracoes" element={<AdminSettings />} />
