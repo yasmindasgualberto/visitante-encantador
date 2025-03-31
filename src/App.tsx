@@ -17,6 +17,13 @@ import ActiveVisits from "./pages/ActiveVisits";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 
+// Admin pages
+import AdminLayout from "./pages/Admin/AdminLayout";
+import AdminDashboard from "./pages/Admin/Dashboard";
+import Subscriptions from "./pages/Admin/Subscriptions";
+import Clients from "./pages/Admin/Clients";
+import AccessControl from "./pages/Admin/AccessControl";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,6 +33,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
+          {/* Main Application Routes */}
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
             <Route path="/visitantes" element={<VisitorsList />} />
@@ -41,6 +49,15 @@ const App = () => (
             <Route path="/relatorios" element={<Reports />} />
             <Route path="/configuracoes" element={<Settings />} />
           </Route>
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="assinaturas" element={<Subscriptions />} />
+            <Route path="clientes" element={<Clients />} />
+            <Route path="acesso" element={<AccessControl />} />
+          </Route>
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>
