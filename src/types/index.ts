@@ -44,3 +44,14 @@ export interface Badge {
   visitId: string;
   isActive: boolean;
 }
+
+export interface Company {
+  id: string;
+  companyName: string;
+  responsibleName: string;
+  email: string;
+  password: string;
+  plan: 'basic' | 'professional' | 'enterprise';
+  status: 'active' | 'blocked' | 'pending';
+  createdAt: string;
+}
