@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from '@/components/ui/card';
@@ -19,6 +18,7 @@ import VisitorBadge from '@/components/VisitorBadge';
 import { getVisitors, getRooms, generateBadgeCode, addVisit } from '@/services/mockData';
 import { Visit, Visitor, Room, Companion } from '@/types';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 const VisitForm = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const VisitForm = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [companions, setCompanions] = useState<Omit<Companion, 'id' | 'visitId'>[]>([]);
+  const [companions, setCompanions] = useState<Companion[]>([]);
   const [responsible, setResponsible] = useState('');
   const [badgeCode, setBadgeCode] = useState('');
   const [newCompanion, setNewCompanion] = useState({ name: '', document: '' });
@@ -43,7 +43,6 @@ const VisitForm = () => {
         setVisitors(visitorsData);
         setRooms(roomsData);
         
-        // Generate random badge code
         const code = generateBadgeCode();
         setBadgeCode(code);
         
@@ -74,7 +73,13 @@ const VisitForm = () => {
       return;
     }
     
-    setCompanions([...companions, newCompanion]);
+    const newCompanionWithId: Companion = {
+      id: uuidv4(),
+      visitId: 'temp-' + uuidv4(),
+      ...newCompanion
+    };
+    
+    setCompanions([...companions, newCompanionWithId]);
     setNewCompanion({ name: '', document: '' });
   };
 
