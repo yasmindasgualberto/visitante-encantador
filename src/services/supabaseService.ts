@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -59,8 +60,8 @@ export const createCompany = async (company: Omit<Company, 'id' | 'createdAt'>):
       responsibleName: data.responsible_name,
       email: data.email,
       password: data.password,
-      plan: data.plan,
-      status: data.status,
+      plan: data.plan as 'basic' | 'professional' | 'enterprise',
+      status: data.status as 'active' | 'blocked' | 'pending',
       createdAt: new Date(data.created_at).toLocaleDateString('pt-BR')
     };
   } catch (error) {
