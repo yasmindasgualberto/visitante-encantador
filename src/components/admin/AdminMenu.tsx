@@ -66,8 +66,7 @@ const AdminMenu: React.FC = () => {
                   <SidebarMenuButton 
                     asChild 
                     isActive={location.pathname === item.url}
-                    className="hover:bg-zinc-800 focus:bg-zinc-800"
-                    activeClassName="bg-zinc-800 text-white"
+                    className={`hover:bg-zinc-800 focus:bg-zinc-800 ${location.pathname === item.url ? 'bg-zinc-800 text-white' : ''}`}
                   >
                     <Link to={item.url} className="flex items-center gap-3">
                       <item.icon className="h-5 w-5" />
