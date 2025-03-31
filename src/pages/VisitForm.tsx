@@ -85,6 +85,7 @@ const VisitForm = () => {
         entryTime: new Date(),
         exitTime: null,
         companions,
+        companyId: selectedVisitor.companyId || selectedRoom.companyId || '1' // Use visitor's or room's companyId or default to '1'
       };
       
       await addVisit(visitData);

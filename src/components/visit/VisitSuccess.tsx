@@ -31,7 +31,8 @@ const VisitSuccess: React.FC<VisitSuccessProps> = ({
     entryTime: new Date(),
     exitTime: null,
     companions,
-    status: 'active'
+    status: 'active',
+    companyId: visitor.companyId || room.companyId || '1' // Use visitor's companyId, room's companyId, or default to '1'
   };
 
   return (
