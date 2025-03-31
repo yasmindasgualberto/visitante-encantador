@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import CompanyForm from '@/components/admin/CompanyForm';
-import { getCompanies, addCompany, updateCompany, deleteCompany } from '@/services/mockData';
+import { getCompanies, createCompany, updateCompany, deleteCompany } from '@/services/supabase/companiesService';
 import { Company } from '@/types';
 import { ClientsHeader } from '@/components/admin/ClientsHeader';
 import { ClientsSearch } from '@/components/admin/ClientsSearch';
@@ -75,7 +74,7 @@ const Clients: React.FC = () => {
         toast.success('Empresa atualizada com sucesso');
       } else {
         // Adiciona nova empresa
-        const newCompany = await addCompany(data);
+        const newCompany = await createCompany(data);
         setCompanies([...companies, newCompany]);
         toast.success('Empresa cadastrada com sucesso');
       }
