@@ -61,13 +61,17 @@ export const ClientsTable: React.FC<ClientsTableProps> = ({
                       <BarChart className="h-4 w-4" />
                     </Button>
                   </Link>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" title="Ver detalhes">
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="outline" 
                     size="icon"
-                    onClick={() => onEditCompany(company)}
+                    title="Editar cliente"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onEditCompany(company);
+                    }}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -75,7 +79,11 @@ export const ClientsTable: React.FC<ClientsTableProps> = ({
                     variant="outline" 
                     size="icon" 
                     className="text-destructive"
-                    onClick={() => onDeleteCompany(company.id)}
+                    title="Excluir cliente"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onDeleteCompany(company.id);
+                    }}
                   >
                     <Trash className="h-4 w-4" />
                   </Button>

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -27,8 +26,8 @@ export const getCompanies = async (): Promise<Company[]> => {
       responsibleName: company.responsible_name,
       email: company.email,
       password: company.password,
-      plan: company.plan,
-      status: company.status,
+      plan: company.plan as 'basic' | 'professional' | 'enterprise',
+      status: company.status as 'active' | 'blocked' | 'pending',
       createdAt: new Date(company.created_at).toLocaleDateString('pt-BR')
     }));
   } catch (error) {
