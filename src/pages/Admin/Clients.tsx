@@ -8,6 +8,7 @@ import { Company } from '@/types';
 import { ClientsHeader } from '@/components/admin/ClientsHeader';
 import { ClientsSearch } from '@/components/admin/ClientsSearch';
 import { ClientsTable } from '@/components/admin/ClientsTable';
+import { ClientsPagination } from '@/components/admin/ClientsPagination';
 
 const Clients: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -16,6 +17,10 @@ const Clients: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Number of items to display per page
   
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -81,10 +86,26 @@ const Clients: React.FC = () => {
     }
   };
 
+  // Filter companies based on search term
   const filteredCompanies = companies.filter(company => 
     company.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     company.responsibleName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
+  
+  // Get current page data
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCompanies.slice(startIndex, endIndex);
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="space-y-6">
@@ -109,11 +130,22 @@ const Clients: React.FC = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <ClientsTable 
-              companies={filteredCompanies} 
-              onEditCompany={handleEditCompany}
-              onDeleteCompany={handleDeleteCompany}
-            />
+            <>
+              <ClientsTable 
+                companies={getCurrentPageData()} 
+                onEditCompany={handleEditCompany}
+                onDeleteCompany={handleDeleteCompany}
+              />
+              
+              {/* Only show pagination if we have more than one page */}
+              {totalPages > 1 && (
+                <ClientsPagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
+            </>
           )}
         </CardContent>
       </Card>
