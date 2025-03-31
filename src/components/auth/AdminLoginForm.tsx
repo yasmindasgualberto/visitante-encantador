@@ -9,25 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
 import { LogIn, Shield } from 'lucide-react';
-
-// Simulando serviço de autenticação para administradores
-const mockVerifyAdminCredentials = (email: string, password: string): Promise<boolean> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Dados fictícios de administradores
-      const authorizedAdmins = [
-        { email: 'admin@sistema.com', password: 'admin123' },
-        { email: 'superadmin@sistema.com', password: 'super123' }
-      ];
-      
-      const isValid = authorizedAdmins.some(
-        admin => admin.email === email && admin.password === password
-      );
-      
-      resolve(isValid);
-    }, 800);
-  });
-};
+import { verifyAdminCredentials } from '@/services/supabaseService';
 
 const adminLoginSchema = z.object({
   email: z.string().email('Digite um email válido'),
@@ -52,7 +34,7 @@ export function AdminLoginForm() {
     setIsLoading(true);
     
     try {
-      const isValidAdmin = await mockVerifyAdminCredentials(data.email, data.password);
+      const isValidAdmin = await verifyAdminCredentials(data.email, data.password);
       
       if (isValidAdmin) {
         // Em um cenário real, armazenaria um token JWT específico para admin

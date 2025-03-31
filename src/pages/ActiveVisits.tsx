@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { UserPlus, Search, Check, Eye } from 'lucide-react';
-import { getActiveVisits, checkoutVisit } from '@/services/mockData';
 import { Visit } from '@/types';
 import { toast } from 'sonner';
+import { getActiveVisits, checkoutVisit } from '@/services/supabaseService';
 
 const ActiveVisits = () => {
   const [visits, setVisits] = useState<Visit[]>([]);

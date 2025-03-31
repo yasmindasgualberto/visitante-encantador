@@ -9,7 +9,243 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      badges: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          visit_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          visit_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "badges_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          company_name: string
+          created_at: string
+          email: string
+          id: string
+          password: string
+          plan: string
+          responsible_name: string
+          status: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          email: string
+          id?: string
+          password: string
+          plan: string
+          responsible_name: string
+          status: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          password?: string
+          plan?: string
+          responsible_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      companions: {
+        Row: {
+          created_at: string
+          document: string
+          id: string
+          name: string
+          visit_id: string
+        }
+        Insert: {
+          created_at?: string
+          document: string
+          id?: string
+          name: string
+          visit_id: string
+        }
+        Update: {
+          created_at?: string
+          document?: string
+          id?: string
+          name?: string
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companions_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          description: string | null
+          floor: string
+          id: string
+          name: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          description?: string | null
+          floor: string
+          id?: string
+          name: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          description?: string | null
+          floor?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visitors: {
+        Row: {
+          company: string | null
+          company_id: string | null
+          created_at: string
+          document: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          photo: string | null
+        }
+        Insert: {
+          company?: string | null
+          company_id?: string | null
+          created_at?: string
+          document: string
+          email: string
+          id?: string
+          name: string
+          phone: string
+          photo?: string | null
+        }
+        Update: {
+          company?: string | null
+          company_id?: string | null
+          created_at?: string
+          document?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          photo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitors_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visits: {
+        Row: {
+          badge_code: string
+          company_id: string
+          created_at: string
+          entry_time: string
+          exit_time: string | null
+          id: string
+          responsible: string
+          room_id: string
+          status: string
+          visitor_id: string
+        }
+        Insert: {
+          badge_code: string
+          company_id: string
+          created_at?: string
+          entry_time?: string
+          exit_time?: string | null
+          id?: string
+          responsible: string
+          room_id: string
+          status: string
+          visitor_id: string
+        }
+        Update: {
+          badge_code?: string
+          company_id?: string
+          created_at?: string
+          entry_time?: string
+          exit_time?: string | null
+          id?: string
+          responsible?: string
+          room_id?: string
+          status?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visits_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
