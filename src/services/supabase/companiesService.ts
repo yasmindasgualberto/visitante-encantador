@@ -151,7 +151,7 @@ export const getCompanyByEmail = async (email: string): Promise<Company | null> 
 
 export const verifyAdminCredentials = async (email: string, password: string): Promise<boolean> => {
   try {
-    const isAdmin = email.includes('admin') && password === 'admin123';
+    const isAdmin = email === 'admin@sistema.com' && password === 'admin123';
     
     return isAdmin;
   } catch (error) {
