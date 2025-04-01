@@ -183,7 +183,7 @@ export const getAdminByEmail = async (email: string) => {
   try {
     const { data, error } = await supabase
       .from('companies')
-      .select('id, responsible_name, email, company_name, password')
+      .select('id, responsible_name, email, company_name, password, phone')
       .eq('email', email)
       .eq('plan', 'admin')
       .single();
@@ -215,6 +215,52 @@ export const updateAdminByEmail = async (email: string, updates: Partial<Company
     return true;
   } catch (error) {
     console.error('Error updating admin:', error);
+    return false;
+  }
+};
+
+/**
+ * Creates a default admin user if no admin exists
+ * @returns boolean indicating if admin was created
+ */
+export const createDefaultAdmin = async (): Promise<boolean> => {
+  try {
+    // Check if admin already exists
+    const { data, error } = await supabase
+      .from('companies')
+      .select('id')
+      .eq('plan', 'admin')
+      .maybeSingle();
+    
+    if (error) throw error;
+    
+    // If admin already exists, no need to create one
+    if (data) {
+      console.log('Admin already exists, no need to create one');
+      return false;
+    }
+    
+    // Create default admin
+    const defaultAdmin = {
+      company_name: 'Sistema Administrativo',
+      responsible_name: 'Administrador',
+      email: 'admin@exemplo.com',
+      password: 'admin123',
+      plan: 'admin',
+      status: 'active',
+      phone: '(00) 00000-0000'
+    };
+    
+    const { error: insertError } = await supabase
+      .from('companies')
+      .insert([defaultAdmin]);
+    
+    if (insertError) throw insertError;
+    
+    console.log('Default admin created successfully');
+    return true;
+  } catch (error) {
+    console.error('Error creating default admin:', error);
     return false;
   }
 };
