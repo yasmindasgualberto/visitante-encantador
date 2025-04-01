@@ -159,3 +159,47 @@ export const verifyAdminCredentials = async (email: string, password: string): P
     return false;
   }
 };
+
+/**
+ * Gets the admin information by email
+ * @param email 
+ * @returns 
+ */
+export const getAdminByEmail = async (email: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('id, responsible_name, email, company_name, password')
+      .eq('email', email)
+      .single();
+    
+    if (error) throw error;
+    
+    return data;
+  } catch (error) {
+    console.error('Error getting admin by email:', error);
+    return null;
+  }
+};
+
+/**
+ * Updates admin information
+ * @param email 
+ * @param updates 
+ * @returns 
+ */
+export const updateAdminByEmail = async (email: string, updates: Partial<Company>) => {
+  try {
+    const { error } = await supabase
+      .from('companies')
+      .update(updates)
+      .eq('email', email);
+    
+    if (error) throw error;
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating admin:', error);
+    return false;
+  }
+};

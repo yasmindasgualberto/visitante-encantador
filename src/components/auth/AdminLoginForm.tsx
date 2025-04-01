@@ -37,8 +37,10 @@ export function AdminLoginForm() {
       const isValidAdmin = await verifyAdminCredentials(data.email, data.password);
       
       if (isValidAdmin) {
-        // Em um cenário real, armazenaria um token JWT específico para admin
+        // Store admin email for profile access and auth check
+        localStorage.setItem('adminEmail', data.email);
         localStorage.setItem('isAdminAuthenticated', 'true');
+        
         toast.success('Login administrativo realizado com sucesso!');
         navigate('/admin');
       } else {
