@@ -1,3 +1,4 @@
+
 import { supabase } from './baseService';
 import { Company } from '@/types';
 
@@ -151,9 +152,22 @@ export const getCompanyByEmail = async (email: string): Promise<Company | null> 
 
 export const verifyAdminCredentials = async (email: string, password: string): Promise<boolean> => {
   try {
-    const isAdmin = email === 'admin@sistema.com' && password === 'admin123';
+    console.log('Verifying admin credentials for:', email);
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('email', email)
+      .eq('password', password)
+      .eq('plan', 'admin')
+      .maybeSingle();
     
-    return isAdmin;
+    if (error) {
+      console.error('Error verifying admin credentials:', error);
+      throw error;
+    }
+    
+    console.log('Admin verification result:', data ? 'Admin found' : 'No admin found');
+    return !!data; // Return true if admin credentials match
   } catch (error) {
     console.error('Error verifying admin credentials:', error);
     return false;
@@ -171,6 +185,7 @@ export const getAdminByEmail = async (email: string) => {
       .from('companies')
       .select('id, responsible_name, email, company_name, password')
       .eq('email', email)
+      .eq('plan', 'admin')
       .single();
     
     if (error) throw error;

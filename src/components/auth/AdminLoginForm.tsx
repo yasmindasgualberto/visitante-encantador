@@ -34,6 +34,7 @@ export function AdminLoginForm() {
     setIsLoading(true);
     
     try {
+      console.log('Attempting admin login with:', data.email);
       const isValidAdmin = await verifyAdminCredentials(data.email, data.password);
       
       if (isValidAdmin) {
@@ -65,7 +66,7 @@ export function AdminLoginForm() {
               <FormLabel>E-mail</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="admin@sistema.com" 
+                  placeholder="admin@exemplo.com" 
                   type="email"
                   {...field} 
                 />
