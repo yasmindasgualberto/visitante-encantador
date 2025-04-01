@@ -70,6 +70,8 @@ export const updateCompany = async (id: string, company: Partial<Omit<Company, '
     if (company.plan) updateData.plan = company.plan;
     if (company.status) updateData.status = company.status;
     
+    console.log('Enviando atualização para a empresa:', id, updateData);
+    
     const { error } = await supabase
       .from('companies')
       .update(updateData)

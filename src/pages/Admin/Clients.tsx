@@ -13,7 +13,7 @@ import { ClientsPagination } from '@/components/admin/ClientsPagination';
 const Clients: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingCompany, setEditingCompany] = useState<Partial<Company> | null>(null);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,8 +45,10 @@ const Clients: React.FC = () => {
   };
 
   const handleEditCompany = (company: Company) => {
-    setIsEditing(true);
+    // Este é o ponto chave - garantimos que todos os dados da empresa sejam passados corretamente
+    console.log("Editando empresa:", company);
     setEditingCompany(company);
+    setIsEditing(true);
     setIsFormOpen(true);
   };
 
