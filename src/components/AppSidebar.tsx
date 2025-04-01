@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UserRound, Building2, Clipboard, Activity, Settings, LogOut } from 'lucide-react';
@@ -27,7 +28,7 @@ const AppSidebar = () => {
     {
       title: "Registro de Visitas",
       icon: Activity,
-      url: "/",
+      url: "/nova-visita",
     },
     {
       title: "Visitantes",

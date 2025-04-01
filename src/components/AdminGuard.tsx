@@ -40,7 +40,7 @@ export const AdminGuard = () => {
     };
     
     checkAuth();
-  }, [location.pathname]);
+  }, []);  // Remove location.pathname from dependency array to prevent infinite loops
   
   if (isLoading) {
     return <div className="flex justify-center items-center min-h-screen">

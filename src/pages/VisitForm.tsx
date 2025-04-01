@@ -1,14 +1,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from '@/components/ui/card';
+import { CardTitle, CardDescription, CardHeader, CardContent, Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { getVisitors, getRooms, generateBadgeCode, addVisit } from '@/services/mockData';
 import { Visit, Visitor, Room, Companion } from '@/types';
 import { toast } from 'sonner';
 import VisitFormContent from '@/components/visit/VisitFormContent';
 import VisitSuccess from '@/components/visit/VisitSuccess';
+import { getVisitors, getRooms } from '@/services/mockData';
+import { createVisit } from '@/services/supabase/visitsService';
+import { v4 as uuidv4 } from 'uuid';
 
 const VisitForm = () => {
   const navigate = useNavigate();
@@ -32,7 +34,8 @@ const VisitForm = () => {
         setVisitors(visitorsData);
         setRooms(roomsData);
         
-        const code = generateBadgeCode();
+        // Generate a unique badge code
+        const code = 'V' + Math.floor(10000 + Math.random() * 90000);
         setBadgeCode(code);
         
         setIsLoading(false);
@@ -75,20 +78,25 @@ const VisitForm = () => {
     setIsSubmitting(true);
     
     try {
-      const visitData: Omit<Visit, 'id' | 'status'> = {
-        visitorId: selectedVisitor.id,
-        visitor: selectedVisitor,
-        roomId: selectedRoom.id,
-        room: selectedRoom,
+      // Use the company ID from visitor or room, or default to '1'
+      const companyId = selectedVisitor.companyId || selectedRoom.companyId || '1';
+      
+      // Format companions for the API
+      const companionsData = companions.map(companion => ({
+        name: companion.name,
+        document: companion.document
+      }));
+      
+      // Create the visit using Supabase service
+      await createVisit(
+        selectedVisitor.id,
+        selectedRoom.id,
         responsible,
         badgeCode,
-        entryTime: new Date(),
-        exitTime: null,
-        companions,
-        companyId: selectedVisitor.companyId || selectedRoom.companyId || '1' // Use visitor's or room's companyId or default to '1'
-      };
+        companionsData,
+        companyId
+      );
       
-      await addVisit(visitData);
       toast.success('Visita registrada com sucesso!');
       setShowBadge(true);
     } catch (error) {
