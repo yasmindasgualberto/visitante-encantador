@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -7,8 +7,53 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Download, Filter, Plus } from 'lucide-react';
 import SubscriptionPlans from '@/components/admin/SubscriptionPlans';
+import { getCompanies } from '@/services/supabase/companiesService';
+import { Company } from '@/types';
+import { toast } from 'sonner';
 
 const Subscriptions: React.FC = () => {
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Preços dos planos
+  const planPrices = {
+    basic: 99.00,
+    professional: 199.00,
+    enterprise: 499.00
+  };
+
+  // Datas de pagamento simuladas
+  const nextPaymentDates = {
+    basic: '02/04/2023',
+    professional: '15/05/2023',
+    enterprise: '22/05/2023'
+  };
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getCompanies();
+        console.log('Empresas carregadas:', data);
+        setCompanies(data);
+      } catch (error) {
+        console.error('Erro ao carregar empresas:', error);
+        toast.error('Erro ao carregar empresas');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
+
+  // Filtra as empresas com base na pesquisa
+  const filteredCompanies = companies.filter(company => 
+    company.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    company.responsibleName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -43,6 +88,8 @@ const Subscriptions: React.FC = () => {
                       type="search"
                       placeholder="Buscar cliente..."
                       className="pl-8 w-[250px]"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                   <Button variant="outline" size="icon">
@@ -67,57 +114,51 @@ const Subscriptions: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">Empresa ABC</TableCell>
-                    <TableCell>Profissional</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                        Ativo
-                      </span>
-                    </TableCell>
-                    <TableCell>R$ 199,00</TableCell>
-                    <TableCell>15/05/2023</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">Editar</Button>
-                        <Button variant="outline" size="sm" className="text-destructive">Cancelar</Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Empresa XYZ</TableCell>
-                    <TableCell>Básico</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                        Atrasado
-                      </span>
-                    </TableCell>
-                    <TableCell>R$ 99,00</TableCell>
-                    <TableCell>02/04/2023</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">Editar</Button>
-                        <Button variant="outline" size="sm" className="text-destructive">Cancelar</Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Empresa 123</TableCell>
-                    <TableCell>Enterprise</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                        Ativo
-                      </span>
-                    </TableCell>
-                    <TableCell>R$ 499,00</TableCell>
-                    <TableCell>22/05/2023</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">Editar</Button>
-                        <Button variant="outline" size="sm" className="text-destructive">Cancelar</Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        Carregando empresas...
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredCompanies.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        Nenhuma empresa encontrada
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredCompanies.map((company) => (
+                      <TableRow key={company.id}>
+                        <TableCell className="font-medium">{company.companyName}</TableCell>
+                        <TableCell>
+                          {company.plan === 'basic' ? 'Básico' : 
+                           company.plan === 'professional' ? 'Profissional' : 
+                           'Enterprise'}
+                        </TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            company.status === 'active' ? 'bg-green-100 text-green-800' : 
+                            company.status === 'blocked' ? 'bg-red-100 text-red-800' : 
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {company.status === 'active' ? 'Ativo' : 
+                             company.status === 'blocked' ? 'Bloqueado' : 
+                             'Pendente'}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          R$ {planPrices[company.plan].toFixed(2).replace('.', ',')}
+                        </TableCell>
+                        <TableCell>{nextPaymentDates[company.plan]}</TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">Editar</Button>
+                            <Button variant="outline" size="sm" className="text-destructive">Cancelar</Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
