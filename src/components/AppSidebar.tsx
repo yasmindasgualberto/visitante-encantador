@@ -28,7 +28,7 @@ const AppSidebar = () => {
     {
       title: "Registro de Visitas",
       icon: Activity,
-      url: "/nova-visita",
+      url: "/visitas/nova",
     },
     {
       title: "Visitantes",
