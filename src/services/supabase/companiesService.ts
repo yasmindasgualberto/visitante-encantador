@@ -1,4 +1,3 @@
-
 import { supabase } from './baseService';
 import { Company } from '@/types';
 
@@ -70,6 +69,8 @@ export const updateCompany = async (id: string, company: Partial<Omit<Company, '
     if (company.plan) updateData.plan = company.plan;
     if (company.status) updateData.status = company.status;
     
+    console.log('Enviando atualização para a empresa:', id, updateData);
+    
     const { error } = await supabase
       .from('companies')
       .update(updateData)
@@ -96,8 +97,9 @@ export const deleteCompany = async (id: string): Promise<void> => {
   }
 };
 
-export const verifyAdminCredentials = async (email: string, password: string): Promise<boolean> => {
+export const verifyCompanyCredentials = async (email: string, password: string): Promise<boolean> => {
   try {
+    console.log('Verifying credentials for:', email);
     const { data, error } = await supabase
       .from('companies')
       .select('*')
@@ -106,9 +108,52 @@ export const verifyAdminCredentials = async (email: string, password: string): P
       .eq('status', 'active')
       .maybeSingle();
     
+    if (error) {
+      console.error('Error verifying company credentials:', error);
+      throw error;
+    }
+    
+    console.log('Verification result:', data ? 'Company found' : 'No company found');
+    return !!data; // Return true if credentials match an active company
+  } catch (error) {
+    console.error('Error verifying company credentials:', error);
+    return false;
+  }
+};
+
+export const getCompanyByEmail = async (email: string): Promise<Company | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
+    
     if (error) throw error;
     
-    return !!data; // Return true if credentials match an active company
+    if (!data) return null;
+    
+    return {
+      id: data.id,
+      companyName: data.company_name,
+      responsibleName: data.responsible_name,
+      email: data.email,
+      password: data.password,
+      plan: data.plan as 'basic' | 'professional' | 'enterprise',
+      status: data.status as 'active' | 'blocked' | 'pending',
+      createdAt: new Date(data.created_at).toLocaleDateString('pt-BR')
+    };
+  } catch (error) {
+    console.error('Error fetching company by email:', error);
+    return null;
+  }
+};
+
+export const verifyAdminCredentials = async (email: string, password: string): Promise<boolean> => {
+  try {
+    const isAdmin = email.includes('admin') && password === 'admin123';
+    
+    return isAdmin;
   } catch (error) {
     console.error('Error verifying admin credentials:', error);
     return false;

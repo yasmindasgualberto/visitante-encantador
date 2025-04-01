@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 
 const formSchema = z.object({
   companyName: z.string().min(3, { message: "Nome da empresa deve ter pelo menos 3 caracteres" }),
@@ -52,14 +52,40 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      companyName: initialData.companyName || "",
-      responsibleName: initialData.responsibleName || "",
-      email: initialData.email || "",
-      password: initialData.password || "",
-      plan: initialData.plan || "basic",
-      status: initialData.status || "active",
+      companyName: "",
+      responsibleName: "",
+      email: "",
+      password: "",
+      plan: "basic",
+      status: "active",
     },
   });
+
+  // Adicionar useEffect para atualizar os valores do formulário quando initialData mudar
+  useEffect(() => {
+    console.log("Dados iniciais do formulário:", initialData);
+    if (isEditing && initialData) {
+      // Reset com os valores iniciais
+      form.reset({
+        companyName: initialData.companyName || "",
+        responsibleName: initialData.responsibleName || "",
+        email: initialData.email || "",
+        password: initialData.password || "",
+        plan: initialData.plan || "basic",
+        status: initialData.status || "active",
+      });
+    } else {
+      // Resetar para os valores padrão quando não estiver editando
+      form.reset({
+        companyName: "",
+        responsibleName: "",
+        email: "",
+        password: "",
+        plan: "basic",
+        status: "active",
+      });
+    }
+  }, [form, initialData, isEditing]);
 
   const handleSubmit = (values: FormValues) => {
     onSubmit(values);
@@ -71,6 +97,11 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Editar Empresa" : "Cadastrar Nova Empresa"}</DialogTitle>
+          <DialogDescription>
+            {isEditing 
+              ? "Modifique os dados da empresa conforme necessário." 
+              : "Preencha os dados para cadastrar uma nova empresa."}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-2">
@@ -139,6 +170,7 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -165,6 +197,7 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>

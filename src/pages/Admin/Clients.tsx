@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -9,14 +8,25 @@ import { ClientsHeader } from '@/components/admin/ClientsHeader';
 import { ClientsSearch } from '@/components/admin/ClientsSearch';
 import { ClientsTable } from '@/components/admin/ClientsTable';
 import { ClientsPagination } from '@/components/admin/ClientsPagination';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 const Clients: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingCompany, setEditingCompany] = useState<Partial<Company> | null>(null);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewingCompany, setViewingCompany] = useState<Company | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,9 +55,15 @@ const Clients: React.FC = () => {
   };
 
   const handleEditCompany = (company: Company) => {
-    setIsEditing(true);
+    console.log("Editando empresa:", company);
     setEditingCompany(company);
+    setIsEditing(true);
     setIsFormOpen(true);
+  };
+
+  const handleViewCompany = (company: Company) => {
+    setViewingCompany(company);
+    setIsDetailsOpen(true);
   };
 
   const handleDeleteCompany = async (companyId: string) => {
@@ -65,7 +81,6 @@ const Clients: React.FC = () => {
   const handleFormSubmit = async (data: any) => {
     try {
       if (isEditing && editingCompany?.id) {
-        // Atualiza empresa existente
         await updateCompany(editingCompany.id, data);
         setCompanies(companies.map(company => 
           company.id === editingCompany.id 
@@ -74,7 +89,6 @@ const Clients: React.FC = () => {
         ));
         toast.success('Empresa atualizada com sucesso');
       } else {
-        // Adiciona nova empresa
         const newCompany = await createCompany(data);
         setCompanies([...companies, newCompany]);
         toast.success('Empresa cadastrada com sucesso');
@@ -86,25 +100,47 @@ const Clients: React.FC = () => {
     }
   };
 
-  // Filter companies based on search term
   const filteredCompanies = companies.filter(company => 
     company.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     company.responsibleName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Calculate total pages
   const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
   
-  // Get current page data
   const getCurrentPageData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filteredCompanies.slice(startIndex, endIndex);
   };
 
-  // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const getPlanLabel = (plan: string) => {
+    switch (plan) {
+      case 'basic':
+        return 'Básico';
+      case 'professional':
+        return 'Profissional';
+      case 'enterprise':
+        return 'Enterprise';
+      default:
+        return plan;
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Ativo';
+      case 'blocked':
+        return 'Bloqueado';
+      case 'pending':
+        return 'Pendente';
+      default:
+        return status;
+    }
   };
 
   return (
@@ -135,9 +171,9 @@ const Clients: React.FC = () => {
                 companies={getCurrentPageData()} 
                 onEditCompany={handleEditCompany}
                 onDeleteCompany={handleDeleteCompany}
+                onViewCompany={handleViewCompany}
               />
               
-              {/* Only show pagination if we have more than one page */}
               {totalPages > 1 && (
                 <ClientsPagination 
                   currentPage={currentPage}
@@ -157,6 +193,71 @@ const Clients: React.FC = () => {
         initialData={editingCompany || {}}
         isEditing={isEditing}
       />
+
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Detalhes da Empresa</DialogTitle>
+            <DialogDescription>
+              Informações completas sobre esta empresa
+            </DialogDescription>
+          </DialogHeader>
+          
+          {viewingCompany && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Nome da Empresa</h3>
+                  <p className="text-base">{viewingCompany.companyName}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Responsável</h3>
+                  <p className="text-base">{viewingCompany.responsibleName}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
+                  <p className="text-base">{viewingCompany.email}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Senha</h3>
+                  <p className="text-base">••••••••</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Plano</h3>
+                  <p className="text-base">{getPlanLabel(viewingCompany.plan)}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
+                  <p className="text-base">{getStatusLabel(viewingCompany.status)}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Cliente desde</h3>
+                  <p className="text-base">{viewingCompany.createdAt}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDetailsOpen(false)}
+              className="mt-4"
+            >
+              Fechar
+            </Button>
+            <Button 
+              onClick={() => {
+                setIsDetailsOpen(false);
+                if (viewingCompany) handleEditCompany(viewingCompany);
+              }}
+              className="mt-4"
+            >
+              Editar Empresa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

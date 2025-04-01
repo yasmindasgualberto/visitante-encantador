@@ -8,27 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { LogIn, Building } from 'lucide-react';
-
-// Simulando um serviço de autenticação
-const mockVerifyCredentials = (email: string, password: string): Promise<boolean> => {
-  // Em um cenário real, isso seria uma chamada à API
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Lista fictícia de empresas autorizadas
-      const authorizedCompanies = [
-        { email: 'empresa@exemplo.com', password: 'senha123' },
-        { email: 'admin@sistema.com', password: 'admin123' }
-      ];
-      
-      const isValid = authorizedCompanies.some(
-        company => company.email === email && company.password === password
-      );
-      
-      resolve(isValid);
-    }, 800);
-  });
-};
+import { LogIn } from 'lucide-react';
+import { verifyCompanyCredentials } from '@/services/supabase/companiesService';
 
 const loginSchema = z.object({
   email: z.string().email('Digite um email válido'),
@@ -53,19 +34,22 @@ export function LoginForm() {
     setIsLoading(true);
     
     try {
-      const isValid = await mockVerifyCredentials(data.email, data.password);
+      console.log('Attempting login with:', data.email);
+      const isValid = await verifyCompanyCredentials(data.email, data.password);
       
       if (isValid) {
-        // Em um cenário real, armazenaria o token JWT
+        // Store authentication state
         localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', data.email);
         toast.success('Login realizado com sucesso!');
         navigate('/visitantes');
       } else {
+        console.log('Login failed: Invalid credentials');
         toast.error('Credenciais inválidas. Empresa não autorizada.');
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast.error('Erro ao fazer login. Tente novamente.');
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
