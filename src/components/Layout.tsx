@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
@@ -25,6 +24,8 @@ const Layout: React.FC = () => {
           
           <footer className="p-4 text-center text-sm text-muted-foreground border-t">
             © {new Date().getFullYear()} Visitante Encantador - Sistema de Controle de Acesso
+            <br />
+            Desenvolvido por Ivan Guallberto
           </footer>
         </main>
       </div>
