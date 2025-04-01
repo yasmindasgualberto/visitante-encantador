@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UserRound, Building2, Clipboard, Activity, Settings, LogOut } from 'lucide-react';
 import { 
   Sidebar, 
@@ -12,9 +11,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from "@/components/ui/sidebar";
+import { toast } from 'sonner';
 
 const AppSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    toast.success('Sessão encerrada com sucesso');
+    navigate('/');
+  };
   
   const menuItems = [
     {
@@ -72,7 +79,10 @@ const AppSidebar = () => {
       </SidebarContent>
 
       <div className="mt-auto p-4 border-t border-sidebar-border">
-        <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-full px-3 py-2 rounded-md hover:bg-secondary/50">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-full px-3 py-2 rounded-md hover:bg-secondary/50"
+        >
           <LogOut className="h-5 w-5" />
           <span>Sair</span>
         </button>
