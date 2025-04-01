@@ -1,9 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, ShieldCheck } from 'lucide-react';
+import { Building, ShieldCheck, Shield } from 'lucide-react';
 import { LoginForm } from '@/components/auth/LoginForm';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -50,6 +51,20 @@ const Index = () => {
           <div className="flex items-center gap-1 text-xs mt-2">
             <ShieldCheck className="h-3 w-3" />
             <span>Sistema exclusivo para empresas autorizadas</span>
+          </div>
+          
+          <div className="w-full mt-6 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full"
+              asChild
+            >
+              <Link to="/admin/login" className="flex items-center justify-center">
+                <Shield className="mr-2 h-4 w-4" />
+                Acesso Administrativo
+              </Link>
+            </Button>
           </div>
         </CardFooter>
       </Card>
