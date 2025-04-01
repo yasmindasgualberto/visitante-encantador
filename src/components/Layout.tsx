@@ -1,19 +1,28 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/AppSidebar';
 import { Toaster } from '@/components/ui/sonner';
 
 const Layout: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  useEffect(() => {
+    // Verificar se o usuário está autenticado
+    const auth = localStorage.getItem('isAuthenticated') === 'true';
+    setIsAuthenticated(auth);
+  }, []);
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
+        {isAuthenticated && <AppSidebar />}
         
         <main className="flex-1 flex flex-col min-h-screen relative">
           <div className="p-4 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <SidebarTrigger />
+              {isAuthenticated && <SidebarTrigger />}
               <h2 className="text-lg font-medium">Portal de Visitantes</h2>
             </div>
           </div>
