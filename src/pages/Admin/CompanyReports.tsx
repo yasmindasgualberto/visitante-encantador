@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, BarChart, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { getCompanyById, getCompanyVisitReport } from '@/services/mockData';
+import { getCompanies, getCompanyVisitsByRoomForPeriod } from '@/services/supabase';
 import { Company, VisitReport } from '@/types';
 
 const CompanyReports: React.FC = () => {
@@ -24,12 +24,31 @@ const CompanyReports: React.FC = () => {
         setIsLoading(true);
         
         // Carregar dados da empresa
-        const companyData = await getCompanyById(id);
-        setCompany(companyData);
+        const companies = await getCompanies();
+        const foundCompany = companies.find(comp => comp.id === id);
         
-        // Carregar relatório de visitas
-        const reportData = await getCompanyVisitReport(id);
-        setReport(reportData);
+        if (foundCompany) {
+          setCompany(foundCompany);
+          
+          // Calcular datas
+          const now = new Date();
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const oneWeekAgo = new Date(today);
+          oneWeekAgo.setDate(today.getDate() - 7);
+          const oneMonthAgo = new Date(today);
+          oneMonthAgo.setMonth(today.getMonth() - 1);
+          
+          // Carregar relatório de visitas para períodos diferentes
+          const dailyVisits = await getCompanyVisitsByRoomForPeriod(id, today.toISOString());
+          const weeklyVisits = await getCompanyVisitsByRoomForPeriod(id, oneWeekAgo.toISOString());
+          const monthlyVisits = await getCompanyVisitsByRoomForPeriod(id, oneMonthAgo.toISOString());
+          
+          setReport({
+            daily: dailyVisits,
+            weekly: weeklyVisits,
+            monthly: monthlyVisits
+          });
+        }
         
         setIsLoading(false);
       } catch (error) {

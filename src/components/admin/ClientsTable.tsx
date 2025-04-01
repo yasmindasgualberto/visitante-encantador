@@ -58,11 +58,19 @@ export const ClientsTable: React.FC<ClientsTableProps> = ({
               <TableCell>{company.createdAt}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
-                  <Link to={`/admin/clientes/relatorios/${company.id}`}>
-                    <Button variant="outline" size="icon" title="Ver relatórios">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    title="Ver relatórios"
+                    onClick={(e) => {
+                      e.preventDefault();
+                    }}
+                    asChild
+                  >
+                    <Link to={`/admin/clientes/relatorios/${company.id}`}>
                       <BarChart className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                   <Button 
                     variant="outline" 
                     size="icon" 
