@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,9 +70,14 @@ const AdminSettings: React.FC = () => {
             .eq('email', email)
             .single();
           
-          if (error) throw error;
+          if (error) {
+            console.error('Error fetching admin data:', error);
+            toast.error('Erro ao carregar dados do administrador: ' + error.message);
+            return;
+          }
           
           if (data) {
+            // Make sure we have valid data before updating state
             setAdminData({
               name: data.responsible_name || '',
               email: data.email || '',
@@ -120,7 +124,11 @@ const AdminSettings: React.FC = () => {
         .eq('email', email)
         .single();
       
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        toast.error('Erro ao verificar senha: ' + fetchError.message);
+        setIsLoading(false);
+        return;
+      }
       
       // Simple password check (in a real app, you would use proper password hashing)
       if (adminData?.password !== data.currentPassword) {
@@ -132,7 +140,8 @@ const AdminSettings: React.FC = () => {
       // Update admin profile
       const updateData: any = {
         responsible_name: data.name,
-        email: data.email
+        email: data.email,
+        phone: data.phone || null // Ensure phone is included in update
       };
       
       // If new password is provided, update it
@@ -145,7 +154,11 @@ const AdminSettings: React.FC = () => {
         .update(updateData)
         .eq('email', email);
       
-      if (updateError) throw updateError;
+      if (updateError) {
+        toast.error('Erro ao atualizar perfil: ' + updateError.message);
+        setIsLoading(false);
+        return;
+      }
       
       // Update localStorage with new email if it changed
       if (data.email !== email) {
