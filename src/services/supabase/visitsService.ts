@@ -225,7 +225,10 @@ export const createVisit = async (
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error inserting visit:', error);
+      throw error;
+    }
     
     // Insert companions if any
     if (companions.length > 0) {
@@ -239,7 +242,10 @@ export const createVisit = async (
         .from('companions')
         .insert(companionsToInsert);
       
-      if (companionsError) throw companionsError;
+      if (companionsError) {
+        console.error('Error inserting companions:', companionsError);
+        throw companionsError;
+      }
     }
     
     // Insert badge
@@ -251,24 +257,41 @@ export const createVisit = async (
         is_active: true
       });
     
-    if (badgeError) throw badgeError;
+    if (badgeError) {
+      console.error('Error inserting badge:', badgeError);
+      throw badgeError;
+    }
     
     // Get visitor and room data for the response
     const { data: visitor, error: visitorError } = await supabase
       .from('visitors')
       .select('*')
       .eq('id', visitorId)
-      .single();
+      .maybeSingle();
     
-    if (visitorError) throw visitorError;
+    if (visitorError) {
+      console.error('Error fetching visitor:', visitorError);
+      throw visitorError;
+    }
+    
+    if (!visitor) {
+      throw new Error('Visitor not found');
+    }
     
     const { data: room, error: roomError } = await supabase
       .from('rooms')
       .select('*')
       .eq('id', roomId)
-      .single();
+      .maybeSingle();
     
-    if (roomError) throw roomError;
+    if (roomError) {
+      console.error('Error fetching room:', roomError);
+      throw roomError;
+    }
+    
+    if (!room) {
+      throw new Error('Room not found');
+    }
     
     return {
       id: data.id,

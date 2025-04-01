@@ -101,7 +101,7 @@ const VisitForm = () => {
       setShowBadge(true);
     } catch (error) {
       console.error('Erro ao registrar visita:', error);
-      toast.error('Erro ao registrar visita');
+      toast.error('Erro ao registrar visita. Verifique os dados e tente novamente.');
       setIsSubmitting(false);
     }
   };
