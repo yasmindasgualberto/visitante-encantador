@@ -1,4 +1,3 @@
-
 import { supabase } from './baseService';
 import { Company } from '@/types';
 
@@ -147,5 +146,16 @@ export const getCompanyByEmail = async (email: string): Promise<Company | null> 
   } catch (error) {
     console.error('Error fetching company by email:', error);
     return null;
+  }
+};
+
+export const verifyAdminCredentials = async (email: string, password: string): Promise<boolean> => {
+  try {
+    const isAdmin = email.includes('admin') && password === 'admin123';
+    
+    return isAdmin;
+  } catch (error) {
+    console.error('Error verifying admin credentials:', error);
+    return false;
   }
 };
