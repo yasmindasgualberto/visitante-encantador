@@ -67,17 +67,44 @@ const VisitForm = () => {
     setCompanions(companions.filter((_, i) => i !== index));
   };
 
+  const validateForm = () => {
+    if (!selectedVisitor) {
+      toast.error('Por favor, selecione um visitante');
+      return false;
+    }
+    
+    if (!selectedRoom) {
+      toast.error('Por favor, selecione uma sala');
+      return false;
+    }
+    
+    if (!responsible) {
+      toast.error('Por favor, informe o responsável pela visita');
+      return false;
+    }
+    
+    if (!badgeCode) {
+      toast.error('O código do crachá não pode estar vazio');
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedVisitor || !selectedRoom || !responsible) {
-      toast.error('Por favor, preencha todos os campos obrigatórios');
+    if (!validateForm()) {
       return;
     }
     
     setIsSubmitting(true);
     
     try {
+      if (!selectedVisitor || !selectedRoom) {
+        throw new Error('Dados incompletos para registro da visita');
+      }
+      
       // Use the company ID from visitor or room, or default to '1'
       const companyId = selectedVisitor.companyId || selectedRoom.companyId || '1';
       
@@ -86,6 +113,15 @@ const VisitForm = () => {
         name: companion.name,
         document: companion.document
       }));
+      
+      console.log('Submitting visit with data:', {
+        visitorId: selectedVisitor.id,
+        roomId: selectedRoom.id,
+        responsible,
+        badgeCode,
+        companions: companionsData,
+        companyId
+      });
       
       // Create the visit using Supabase service
       await createVisit(

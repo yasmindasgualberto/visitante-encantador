@@ -211,6 +211,13 @@ export const createVisit = async (
   companyId: string
 ): Promise<Visit> => {
   try {
+    console.log('Creating visit with data:', { visitorId, roomId, responsible, badgeCode, companions, companyId });
+    
+    // Validate required fields
+    if (!visitorId || !roomId || !responsible || !badgeCode || !companyId) {
+      throw new Error('Missing required fields for visit creation');
+    }
+    
     // Insert visit
     const { data, error } = await supabase
       .from('visits')
@@ -230,13 +237,21 @@ export const createVisit = async (
       throw error;
     }
     
+    if (!data) {
+      throw new Error('Failed to create visit record');
+    }
+    
+    console.log('Visit created successfully:', data);
+    
     // Insert companions if any
-    if (companions.length > 0) {
+    if (companions && companions.length > 0) {
       const companionsToInsert = companions.map(companion => ({
         name: companion.name,
         document: companion.document,
         visit_id: data.id
       }));
+      
+      console.log('Inserting companions:', companionsToInsert);
       
       const { error: companionsError } = await supabase
         .from('companions')
@@ -249,6 +264,8 @@ export const createVisit = async (
     }
     
     // Insert badge
+    console.log('Inserting badge with code:', badgeCode);
+    
     const { error: badgeError } = await supabase
       .from('badges')
       .insert({
@@ -263,6 +280,8 @@ export const createVisit = async (
     }
     
     // Get visitor and room data for the response
+    console.log('Fetching visitor data for ID:', visitorId);
+    
     const { data: visitor, error: visitorError } = await supabase
       .from('visitors')
       .select('*')
@@ -275,8 +294,11 @@ export const createVisit = async (
     }
     
     if (!visitor) {
+      console.error('Visitor not found for ID:', visitorId);
       throw new Error('Visitor not found');
     }
+    
+    console.log('Fetching room data for ID:', roomId);
     
     const { data: room, error: roomError } = await supabase
       .from('rooms')
@@ -290,8 +312,11 @@ export const createVisit = async (
     }
     
     if (!room) {
+      console.error('Room not found for ID:', roomId);
       throw new Error('Room not found');
     }
+    
+    console.log('Visit creation completed successfully');
     
     return {
       id: data.id,
@@ -304,14 +329,16 @@ export const createVisit = async (
         phone: visitor.phone,
         email: visitor.email,
         company: visitor.company,
-        createdAt: new Date(visitor.created_at)
+        createdAt: new Date(visitor.created_at),
+        companyId: visitor.company_id
       },
       roomId: data.room_id,
       room: {
         id: room.id,
         name: room.name,
         floor: room.floor,
-        description: room.description
+        description: room.description,
+        companyId: room.company_id
       },
       responsible: data.responsible,
       badgeCode: data.badge_code,
