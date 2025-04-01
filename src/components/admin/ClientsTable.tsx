@@ -11,12 +11,14 @@ interface ClientsTableProps {
   companies: Company[];
   onEditCompany: (company: Company) => void;
   onDeleteCompany: (companyId: string) => void;
+  onViewCompany: (company: Company) => void;
 }
 
 export const ClientsTable: React.FC<ClientsTableProps> = ({
   companies,
   onEditCompany,
   onDeleteCompany,
+  onViewCompany,
 }) => {
   const getPlanLabel = (plan: string) => {
     switch (plan) {
@@ -61,7 +63,15 @@ export const ClientsTable: React.FC<ClientsTableProps> = ({
                       <BarChart className="h-4 w-4" />
                     </Button>
                   </Link>
-                  <Button variant="outline" size="icon" title="Ver detalhes">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    title="Ver detalhes"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onViewCompany(company);
+                    }}
+                  >
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button 
