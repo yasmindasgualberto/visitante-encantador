@@ -2,15 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Visit, Visitor, Room, Companion } from '@/types';
 import { toast } from 'sonner';
 import VisitFormContent from '@/components/visit/VisitFormContent';
 import VisitSuccess from '@/components/visit/VisitSuccess';
+import VisitFormHeader from '@/components/visit/VisitFormHeader';
 import { getVisitors, getRooms } from '@/services/mockData';
 import { createVisit } from '@/services/supabase/visitsService';
-import { v4 as uuidv4 } from 'uuid';
+import CameraCapture from '@/components/CameraCapture';
 
 const VisitForm = () => {
   const navigate = useNavigate();
@@ -156,20 +156,10 @@ const VisitForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto animate-enter">
-      <div className="mb-6">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')} 
-          className="flex items-center gap-2 mb-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Voltar
-        </Button>
-        <h1 className="text-2xl font-bold">Registrar Nova Visita</h1>
-        <p className="text-muted-foreground">
-          Preencha os dados para registrar uma nova entrada no sistema.
-        </p>
-      </div>
+      <VisitFormHeader 
+        title="Registrar Nova Visita"
+        description="Preencha os dados para registrar uma nova entrada no sistema."
+      />
 
       {showBadge && selectedVisitor && selectedRoom ? (
         <VisitSuccess
