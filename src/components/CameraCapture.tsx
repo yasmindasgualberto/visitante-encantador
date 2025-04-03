@@ -22,6 +22,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      console.log('Available video devices:', videoDevices);
       setDevices(videoDevices);
       
       // Set default device if available
@@ -43,6 +44,8 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
     }
 
     try {
+      console.log('Starting camera with device ID:', selectedDeviceId);
+      
       const constraints: MediaStreamConstraints = {
         video: selectedDeviceId 
           ? {
@@ -57,7 +60,9 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
             } 
       };
       
+      console.log('Using constraints:', constraints);
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Camera stream obtained successfully');
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -104,16 +109,20 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
   };
 
   const handleDeviceChange = (deviceId: string) => {
+    console.log('Selected device changed to:', deviceId);
     setSelectedDeviceId(deviceId);
   };
 
-  // Initialize camera when component mounts or selected device changes
+  // Initialize camera when component mounts
   useEffect(() => {
-    getVideoDevices();
+    console.log('CameraCapture component mounted');
     
     // Request permissions and list devices when component mounts
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(() => getVideoDevices())
+      .then(() => {
+        console.log('Camera permission granted');
+        getVideoDevices();
+      })
       .catch(err => {
         console.error('Error getting permission:', err);
         setError('Permissão de câmera negada. Por favor, permita o acesso à câmera.');
@@ -127,6 +136,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
   // Start camera when device is selected
   useEffect(() => {
     if (selectedDeviceId) {
+      console.log('Selected device ID changed, starting camera');
       startCamera();
     }
   }, [selectedDeviceId, startCamera]);
@@ -165,22 +175,21 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onClose }) => 
         </Button>
       </div>
       
-      {devices.length > 1 && (
-        <div className="mb-4">
-          <Select value={selectedDeviceId} onValueChange={handleDeviceChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecionar câmera" />
-            </SelectTrigger>
-            <SelectContent>
-              {devices.map((device) => (
-                <SelectItem key={device.deviceId} value={device.deviceId}>
-                  {device.label || `Câmera ${devices.indexOf(device) + 1}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      {/* Always show camera selector, regardless of number of devices */}
+      <div className="mb-4">
+        <Select value={selectedDeviceId} onValueChange={handleDeviceChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecionar câmera" />
+          </SelectTrigger>
+          <SelectContent>
+            {devices.map((device) => (
+              <SelectItem key={device.deviceId} value={device.deviceId}>
+                {device.label || `Câmera ${devices.indexOf(device) + 1}`}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       
       <div className="relative mb-4 bg-black rounded-lg overflow-hidden h-80 flex items-center justify-center">
         {!isRecording && (
