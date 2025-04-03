@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { UserPlus, Search, User, Edit, Eye } from 'lucide-react';
-import { getVisitors } from '@/services/mockData';
+import { getVisitors } from '@/services/supabase/visitorsService';
 import { Visitor } from '@/types';
 import { toast } from 'sonner';
 
@@ -19,7 +19,9 @@ const VisitorsList = () => {
   useEffect(() => {
     const fetchVisitors = async () => {
       try {
+        console.log('Fetching visitors...');
         const data = await getVisitors();
+        console.log('Visitors fetched:', data);
         setVisitors(data);
         setFilteredVisitors(data);
         setIsLoading(false);

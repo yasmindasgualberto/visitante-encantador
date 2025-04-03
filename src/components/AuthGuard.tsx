@@ -17,38 +17,40 @@ export const AuthGuard = () => {
   
   useEffect(() => {
     const checkAuth = async () => {
-      const storedAuth = localStorage.getItem('isAuthenticated') === 'true';
-      const userEmail = localStorage.getItem('userEmail');
-      
-      if (storedAuth && userEmail) {
-        try {
-          // Verify if company exists and is active
-          const company = await getCompanyByEmail(userEmail);
-          
-          if (company && company.status === 'active') {
-            setIsAuthenticated(true);
-          } else {
-            // Company is no longer active or doesn't exist
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('userEmail');
-            setIsAuthenticated(false);
-            if (!isPublicRoute) {
-              toast.error('Sua empresa não está mais ativa. Por favor, entre em contato com o administrador.');
+      try {
+        const storedAuth = localStorage.getItem('isAuthenticated') === 'true';
+        const userEmail = localStorage.getItem('userEmail');
+        
+        if (storedAuth && userEmail) {
+          try {
+            // Verify if company exists and is active
+            const company = await getCompanyByEmail(userEmail);
+            
+            if (company && company.status === 'active') {
+              setIsAuthenticated(true);
+            } else {
+              // Company is no longer active or doesn't exist
+              localStorage.removeItem('isAuthenticated');
+              localStorage.removeItem('userEmail');
+              setIsAuthenticated(false);
+              if (!isPublicRoute) {
+                toast.error('Sua empresa não está mais ativa. Por favor, entre em contato com o administrador.');
+              }
             }
+          } catch (error) {
+            console.error('Error checking company status:', error);
+            setIsAuthenticated(false);
           }
-        } catch (error) {
-          console.error('Error checking company status:', error);
+        } else {
           setIsAuthenticated(false);
         }
-      } else {
-        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
     
     checkAuth();
-  }, [location.pathname, isPublicRoute]);
+  }, [isPublicRoute]); // Removed location.pathname from dependencies to prevent infinite loop
   
   if (isLoading) {
     return <div className="flex justify-center items-center min-h-screen">
