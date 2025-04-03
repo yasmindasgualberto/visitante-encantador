@@ -3,14 +3,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Camera, Save, ArrowLeft } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import CameraCapture from '@/components/CameraCapture';
 import { addVisitor } from '@/services/mockData';
 import { toast } from 'sonner';
+import VisitorFormHeader from '@/components/visitor/VisitorFormHeader';
+import VisitorFormFields from '@/components/visitor/VisitorFormFields';
 
 const VisitorForm = () => {
   const navigate = useNavigate();
@@ -67,20 +66,10 @@ const VisitorForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto animate-enter">
-      <div className="mb-6">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/visitantes')} 
-          className="flex items-center gap-2 mb-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Voltar
-        </Button>
-        <h1 className="text-2xl font-bold">Cadastrar Novo Visitante</h1>
-        <p className="text-muted-foreground">
-          Preencha os dados para cadastrar um novo visitante no sistema.
-        </p>
-      </div>
+      <VisitorFormHeader 
+        title="Cadastrar Novo Visitante"
+        description="Preencha os dados para cadastrar um novo visitante no sistema."
+      />
 
       <Card>
         <form onSubmit={handleSubmit}>
@@ -91,88 +80,11 @@ const VisitorForm = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo *</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="document">Documento (CPF/RG) *</Label>
-                <Input
-                  id="document"
-                  name="document"
-                  value={formData.document}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="company">Empresa/Organização</Label>
-              <Input
-                id="company"
-                name="company"
-                value={formData.company}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Foto</Label>
-              <div className="flex items-start gap-4">
-                <div className="border rounded-md p-1 w-32 h-32 flex items-center justify-center bg-muted/20">
-                  {formData.photo ? (
-                    <img
-                      src={formData.photo}
-                      alt="Foto do visitante"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="text-center text-muted-foreground text-sm">
-                      Sem foto
-                    </div>
-                  )}
-                </div>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={handleCameraOpen}
-                  className="flex items-center gap-2"
-                >
-                  <Camera className="h-4 w-4" />
-                  Capturar Foto
-                </Button>
-              </div>
-            </div>
+            <VisitorFormFields
+              formData={formData}
+              handleChange={handleChange}
+              handleCameraOpen={handleCameraOpen}
+            />
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button
