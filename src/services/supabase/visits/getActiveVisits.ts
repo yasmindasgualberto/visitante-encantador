@@ -1,7 +1,7 @@
 
 import { supabase } from '../baseService';
 import { Visit } from '@/types';
-import { VisitWithRaw, VisitCompanionRaw } from './types';
+import { VisitCompanionRaw } from './types';
 
 /**
  * Retrieves all active visits (with no exit time) from the database
@@ -21,7 +21,7 @@ export const getActiveVisits = async (): Promise<Visit[]> => {
     
     if (error) throw error;
     
-    const visits = await Promise.all(data.map(async (visit: VisitWithRaw) => {
+    const visits = await Promise.all(data.map(async (visit: any) => {
       // Get companions for each visit
       const { data: companions, error: companionsError } = await supabase
         .from('companions')

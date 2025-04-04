@@ -13,7 +13,7 @@ export interface VisitWithRaw {
   badge_code: string;
   entry_time: string;
   exit_time: string | null;
-  status: 'active' | 'completed' | 'cancelled';
+  status: string; // Changed from 'active' | 'completed' | 'cancelled' to string
   company_id: string;
 }
 

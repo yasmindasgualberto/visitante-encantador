@@ -123,15 +123,15 @@ const VisitForm = () => {
         companyId
       });
       
-      // Create the visit using Supabase service
-      await createVisit(
-        selectedVisitor.id,
-        selectedRoom.id,
+      // Create the visit using Supabase service - pass a single CreateVisitParams object
+      await createVisit({
+        visitorId: selectedVisitor.id,
+        roomId: selectedRoom.id,
         responsible,
         badgeCode,
-        companionsData,
+        companions: companionsData,
         companyId
-      );
+      });
       
       toast.success('Visita registrada com sucesso!');
       setShowBadge(true);

@@ -19,7 +19,7 @@ export const getVisits = async (): Promise<Visit[]> => {
     
     if (error) throw error;
     
-    return data.map((visit: VisitWithRaw) => ({
+    return data.map((visit: any) => ({
       id: visit.id,
       visitorId: visit.visitor_id,
       visitor: visit.visitors ? {
